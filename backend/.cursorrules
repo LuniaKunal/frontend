@@ -1,0 +1,112 @@
+# .cursorrules
+
+You are a 1000x AI Engineer assisting with a FastAPI backend for a SaaS project. The backend uses Supabase as the database and integrates the Gemini API for automating bill entry. The project supports Invoice Entry, Ledger Reports, Outstanding Reports, Commission Reports, and Payment Reminder Alerts. Below are the guidelines for working with this codebase.
+
+## Project Context
+- **Backend Framework**: FastAPI
+- **Database**: Supabase (PostgreSQL-based, hosted service)
+- **External API**: Gemini API for automating bill entry
+- **Requirements**:
+  - Invoice Entry: Manual and automated (via Gemini API)
+  - Ledger Report: Chronological transaction history per buyer/supplier
+  - Outstanding Report: Calculate unpaid invoice balances
+  - Commission Report: Compute commissions from invoice/payment data
+  - Payment Reminder Alerts: Notify buyers when payments are overdue past a specific threshold (e.g., 7 days)
+
+## File Structure
+The backend codebase is organized as follows:
+- `backend/`
+  - `app/`
+    - `__init__.py`: Package initializer
+    - `main.py`: FastAPI app entry point
+    - `database.py`: Supabase connection and session management
+  - `models/`
+    - `__init__.py`: Package initializer
+    - `invoice.py`: Invoice table schema
+    - `payment.py`: Payment and allocation table schemas
+    - `adjustment.py`: Invoice adjustment (discounts, returns) table schema
+    - `ledger.py`: Ledger table schema (optional, may be a view)
+  - `schemas/`
+    - `__init__.py`: Package initializer
+    - `invoice.py`: Invoice data validation/serialization
+    - `payment.py`: Payment data validation/serialization
+  - `routes/`
+    - `__init__.py`: Package initializer
+    - `invoices.py`: API endpoints for invoice management
+    - `payments.py`: API endpoints for payment management
+    - `ledger.py`: API endpoint for ledger reports
+    - `outstanding.py`: API endpoint for outstanding reports
+    - `commission.py`: API endpoint for commission reports
+    - `alerts.py`: API endpoint for payment reminder alerts
+  - `crud/`
+    - `__init__.py`: Package initializer
+    - `invoice.py`: Reusable invoice CRUD operations
+    - `payment.py`: Reusable payment CRUD operations
+    - `ledger.py`: Reusable ledger generation functions
+    - `outstanding.py`: Reusable outstanding balance calculations
+    - `commission.py`: Reusable commission calculation functions
+  - `services/`
+    - `__init__.py`: Package initializer
+    - `gemini.py`: Gemini API integration for bill automation
+    - `alerts.py`: Logic for payment reminder alerts
+  - `.env`: Environment variables (Supabase credentials, Gemini API key)
+  - `requirements.txt`: Project dependencies
+
+## Working with FastAPI and Supabase
+
+### Database Integration (Supabase)
+- Use Supabase as the PostgreSQL database, accessed via its Python client (`supabase-py`) or SQLAlchemy with a Supabase connection URL.
+- Store Supabase credentials (URL, API key) in `.env` and load them in `database.py`.
+- Define table schemas in `models/` to match Supabase tables (e.g., `invoices`, `payments`).
+- Leverage Supabase’s real-time features or row-level security if needed for alerts or access control.
+
+### File Responsibilities
+- **`main.py`**: Initializes FastAPI, registers routes, and sets up Supabase on startup.
+- **`database.py`**: Configures Supabase connection, provides session management for CRUD/routes.
+- **`models/`**: Defines database schemas for invoices, payments, adjustments, and ledger.
+- **`schemas/`**: Validates and serializes data for API requests/responses.
+- **`routes/`**: Exposes endpoints for each feature (e.g., POST /invoices, GET /ledger).
+- **`crud/`**: Houses reusable database operations (e.g., create_invoice, get_outstanding).
+- **`services/gemini.py`**: Integrates Gemini API to parse bills and feed data to CRUD.
+- **`services/alerts.py`**: Checks overdue invoices and triggers alerts (e.g., via email or Supabase functions).
+
+### Reusability Logic
+- Centralize database operations in `crud/` for reuse across routes and services.
+- Use `services/` for complex logic (e.g., Gemini API calls, alert scheduling) that can be called from multiple endpoints.
+- Pass Supabase sessions to functions via FastAPI dependency injection for consistent access.
+- Reuse functions like outstanding balance calculations in both ledger and outstanding reports.
+
+## Do's and Don'ts
+
+### Do's
+- **Do** use Supabase’s PostgreSQL features (e.g., views, triggers) for ledger generation or alerts if performance is critical.
+- **Do** modularize logic: Keep CRUD operations separate from route handlers and service logic.
+- **Do** store sensitive data (e.g., Supabase keys, Gemini API key) in `.env`.
+- **Do** use FastAPI’s dependency injection to share Supabase sessions across the app.
+- **Do** leverage Supabase’s client library for simple queries and SQLAlchemy for complex joins.
+
+### Don'ts
+- **Don’t** hardcode Supabase credentials or API keys in source files.
+- **Don’t** duplicate CRUD logic—centralize it in `crud/` instead of rewriting in routes.
+- **Don’t** overuse Supabase real-time features unless required, to avoid unnecessary overhead.
+- **Don’t** mix business logic (e.g., commission calculations) with route handlers—delegate to `crud/` or `services/`.
+
+## Best Practices for Large Codebase
+- **Modularity**: Keep each file focused on a single responsibility (e.g., `invoices.py` in `routes/` only handles invoice endpoints).
+- **Naming Conventions**: Use clear, consistent names (e.g., `create_invoice` in `crud/invoice.py`).
+- **Documentation**: Add docstrings to all functions explaining purpose, inputs, and outputs.
+- **Error Handling**: Implement try-except blocks in routes and services for Supabase/Gemini API failures.
+- **Testing**: Write unit tests for CRUD functions and integration tests for routes/services.
+- **Scalability**: Use Supabase connection pooling for high traffic and consider background tasks (e.g., Celery) for alerts.
+- **Version Control**: Commit changes per feature (e.g., “Add invoice CRUD”, “Implement Gemini integration”).
+- **Logging**: Add logging in `main.py` and key services to track errors and performance.
+- **Dependency Management**: List all packages (e.g., `fastapi`, `supabase-py`) in `requirements.txt`.
+
+## Guidance for AI Assistance
+- When suggesting changes, respect the file structure and place logic in the appropriate module (e.g., CRUD in `crud/`, API routes in `routes/`).
+- Focus on backend-only solutions; do not mention frontend frameworks or code.
+- Provide explanations for Supabase-specific features (e.g., how to query, use triggers) when relevant.
+- Optimize for reusability by suggesting centralized functions in `crud/` or `services/`.
+- Highlight best practices or warn about anti-patterns if my request risks violating them.
+
+This backend powers a SaaS app with invoice management, reporting, and alerts. Assist me in building, debugging, or optimizing it based on these rules!

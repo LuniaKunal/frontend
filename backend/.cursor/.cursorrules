@@ -1,0 +1,169 @@
+# .cursorrules for FastAPI Backend Project
+
+## Project Overview
+- This project uses **FastAPI** for the backend and **Next.js** for the frontend.
+- The backend is responsible for data persistence, business logic, API endpoints, and integration with external services like the **Gemini API** for automating bill entry.
+- The database is a relational database (e.g., **PostgreSQL**) managed via **SQLAlchemy**.
+- Key features include:
+  - Invoice entry (manual and automated).
+  - Ledger reports (chronological transaction records).
+  - Outstanding reports (unpaid invoice balances).
+  - Commission reports (computed commissions).
+  - Payment reminders (alerts for overdue invoices).
+
+---
+
+## Backend Structure
+The backend follows a modular directory structure for scalability and maintainability:
+backend/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── database.py
+|── models/
+│   ├── __init__.py
+│   ├── invoice.py
+│   ├── payment.py
+│   ├── adjustment.py
+│   └── ledger.py
+├── schemas/
+│   ├── __init__.py
+│   ├── invoice.py
+│   └── payment.py
+├── routes/
+│   ├── __init__.py
+│   ├── invoices.py
+│   ├── payments.py
+│   ├── ledger.py
+│   ├── outstanding.py
+│   ├── commission.py
+│   └── alerts.py
+├── crud/
+│   │── __init__.py
+│   ├── invoice.py
+│   ├── payment.py
+│   ├── ledger.py
+│   ├── outstanding.py
+│   └── commission.py
+├── services/
+│   ├── __init__.py
+│   ├── gemini.py
+│   └── alerts.py
+├── .env
+└── requirements.txt
+
+---
+
+## Database Configuration
+- Centralize database setup in **`database.py`** using **SQLAlchemy**.
+- Load the database connection URL from the **`DATABASE_URL`** environment variable.
+- Create a session factory for managing database sessions.
+- Provide a **`get_db`** dependency to supply database sessions to routes and functions.
+- Initialize tables on app startup with `Base.metadata.create_all()`.
+
+---
+
+## Model Definitions
+- Define database models in **`models/`** using SQLAlchemy’s declarative base.
+- Each model represents a table (e.g., `Invoice`, `Payment`, `Adjustment`).
+- Include relationships (e.g., foreign keys, one-to-many) as needed.
+- Import all models in **`database.py`** to ensure table creation.
+
+---
+
+## Schema Definitions
+- Use **Pydantic** schemas in **`schemas/`** for validating and serializing data.
+- Define separate schemas for requests (input) and responses (output).
+- Reference these schemas in route definitions for automatic validation and documentation.
+
+---
+
+## CRUD Operations
+- Implement reusable CRUD functions in **`crud/`** for each model (e.g., `create_invoice`, `get_invoices`).
+- Functions should accept a database session and relevant parameters.
+- Use these functions in routes and services to prevent code duplication.
+- Include common features like filtering, sorting, and pagination where applicable.
+
+---
+
+## Route Implementations
+- Define API endpoints in **`routes/`** using FastAPI’s `APIRouter`.
+- Inject database sessions with **`Depends(get_db)`**.
+- Use Pydantic schemas to specify request and response models.
+- Group routes by feature (e.g., `invoices.py`, `reports.py`) and use tags (e.g., `tags=["invoices"]`) for organization and documentation.
+
+---
+
+## Service Layer
+- Encapsulate complex business logic in **`services/`**.
+- Example: Integrate with the **Gemini API** in `services/gemini.py` for automated bill entry.
+- Services should call CRUD functions or other services to build functionality.
+- Keep services modular and focused on specific tasks (e.g., invoice processing, alert generation).
+
+---
+
+## External API Integrations
+- For the **Gemini API** (and similar integrations):
+  - Store API keys in environment variables (e.g., `GEMINI_API_KEY`).
+  - Implement error handling (e.g., retries, timeouts) for API calls.
+  - Transform API responses into formats suitable for database storage.
+- Ensure secure and efficient communication with external services.
+
+---
+
+## Environment Management
+- Store sensitive data (e.g., database URLs, API keys) in a **`.env`** file.
+- Load variables using **`python-dotenv`** in relevant files (e.g., `database.py`).
+- Avoid hardcoding sensitive information in the codebase.
+
+---
+
+## Best Practices
+### Do:
+- **Use dependency injection** for database sessions and shared resources.
+- **Validate all data** with Pydantic schemas in API endpoints.
+- **Reuse code** via CRUD functions and services to minimize duplication.
+- **Follow RESTful design** (e.g., use `POST` for creation, `GET` for retrieval, appropriate status codes).
+- **Log key events** (e.g., errors, API calls) for debugging and monitoring.
+- **Write tests** for critical components (CRUD, services, routes).
+
+### Don’t:
+- **Hardcode sensitive data** like database URLs or API keys.
+- **Duplicate logic**; abstract it into reusable functions or services.
+- **Expose sensitive information** (e.g., user data, API keys) in responses.
+- **Overcomplicate routes**; delegate business logic to services.
+- **Ignore exceptions**; handle errors gracefully in all operations.
+
+---
+
+## Specific Requirements
+- **Invoice Entry**:
+  - Provide routes for manual and automated invoice creation.
+  - Use `services/gemini.py` to parse bills via the Gemini API and create invoices.
+- **Ledger Report**:
+  - Implement routes to fetch and display transaction histories (invoices, payments, adjustments).
+  - Leverage CRUD functions for data retrieval and aggregation.
+- **Outstanding Report**:
+  - Calculate unpaid invoice balances with filtering options (e.g., by buyer, date).
+  - Return aggregated data via dedicated endpoints.
+- **Commission Report**:
+  - Compute commissions based on invoice or payment data.
+  - Support configurable rules (e.g., percentage-based, fixed amounts).
+- **Payment Reminders**:
+  - Create a service to detect overdue invoices (e.g., due date exceeded by X days).
+  - Integrate with notification systems (e.g., email, SMS) for alerts.
+  - Consider background tasks (e.g., via `celery` or cron) for automation.
+
+---
+
+## Large Codebase Management
+- **Modularize**: Split code by feature or domain (e.g., invoices, payments) for clarity.
+- **Naming Conventions**: Use consistent, descriptive names for files, functions, and variables.
+- **Documentation**: Add comments and docstrings for complex logic and public APIs.
+- **Version Control**: Use Git with clear commit messages and feature branches.
+- **Testing**: Automate unit and integration tests to ensure stability.
+- **Performance**: Optimize database queries (e.g., use indexes, avoid N+1 issues) and monitor API performance.
+
+---
+
+This `.cursorrules` file ensures that the AI assistant maintains a consistent, scalable, and high-quality FastAPI backend. It provides clear guidelines for code structure, best practices, and feature implementation while avoiding common pitfalls in a large codebase.

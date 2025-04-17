@@ -1,0 +1,46 @@
+# Project Overview
+
+ProAccount is a web application designed to assist agencies managing B2B relationships (e.g., buyer-supplier interactions) by streamlining financial operations. Key features include ledger management, tracking outstanding payments, generating invoices, recording payments, and calculating supplier commissions. It is built using Next.js and TypeScript. It integrates various libraries for state management, UI components, and data fetching.
+
+
+# Project Structure
+
+- **Components**: Contains reusable UI components.
+- **App**: Next.js app for routing.
+- **Hooks**: Custom React hooks for state management.
+
+# Development Guidelines
+
+- Use TypeScript for type safety.
+- Follow the coding standards defined in the ESLint configuration.
+- Ensure all components are responsive and accessible.
+- Use Tailwind CSS for styling, adhering to the defined color palette.
+
+# Behavior Rules
+
+- You have one mission: execute *excatly* what is requested.
+- Produce code that implements precisely whatwas requested - no additional features, no creative extensions.Follow instructions to the letter.
+- Confirm your solution addresses every specified requirements, without adding ANYTHING the user didn't ask for. The user's job depends on this - you add anything they didn't ask for, its likely they get fired.
+- Your value comes from precision and reliablity. When in doubt, implement the simplest solution that fulfilles all requirements. The fewer lens of code the better - but obviously ensure you complete the task the user wants you to.
+- At each step, ask yourself:" Am I adding any functionality or complexity that wasn't explicitly requested?". This will force you to stay on track.
+
+# Important Scripts
+
+- `dev`: Starts the development server.
+- `build`: Builds the application for production.
+
+# AI Interaction Guidelines
+
+- When generating code, prioritize TypeScript and React best practices.
+- Ensure that any new components are reusable and follow the existing design patterns.
+- Minimize the use of AI generated comments, instead use clearly named variables and functions.
+- Always validate user inputs and handle errors gracefully.
+- Use the existing components and pages as a reference for the new components and pages.
+
+# Additional Resources
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [React Documentation](https://reactjs.org/docs/getting-started.html)
+
